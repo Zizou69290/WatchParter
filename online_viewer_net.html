@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste Films & Jeux</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(30, 30, 30, 0.9), rgba(44, 62, 80, 0.9)), url('path/to/twin_peaks_background.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: #dcdcdc;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #a9a9a9;
+        }
+
+        input,
+        button,
+        select {
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: none;
+            margin: 5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        button {
+            background: #2e8b57;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.3s;
+        }
+
+        button:hover {
+            background: #006400;
+            transform: scale(1.05);
+        }
+
+        .lists-container {
+            display: flex;
+            justify-content: center;
+            gap: 50px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .list {
+            width: 320px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s;
+        }
+
+        .list:hover {
+            transform: scale(1.05);
+        }
+
+        h2 {
+            border-bottom: 2px solid #a9a9a9;
+            padding-bottom: 5px;
+            color: #a9a9a9;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            background: #696969;
+            margin: 10px auto;
+            padding: 12px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s, transform 0.3s;
+        }
+
+        li:hover {
+            background: #556b2f;
+            transform: scale(1.05);
+        }
+
+        .delete-btn {
+            background: #2e8b57;
+            color: white;
+            border: none;
+            padding: 5px 8px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background 0.3s, transform 0.3s;
+        }
+
+        .delete-btn:hover {
+            background: #006400;
+            transform: scale(1.1);
+        }
+
+        .random-container {
+            margin-top: 30px;
+        }
+
+        .random-container button {
+            background: #556b2f;
+        }
+
+        .random-container button:hover {
+            background: #2e8b57;
+        }
+
+        #resultatRandom {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            color: #a9a9a9;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Films et Jeux à Découvrir</h1>
+    <select id="pseudo">
+        <option value="Claire">Claire</option>
+        <option value="Nico">Nico</option>
+        <option value="Antho">Antho</option>
+    </select>
+    <input type="text" id="inputItem" placeholder="Entrez un film ou un jeu">
+    <select id="categorie">
+        <option value="films">Film</option>
+        <option value="jeux">Jeu-vidéo</option>
+    </select>
+    <button onclick="ajouterItem()">Ajouter</button>
+
+    <div class="lists-container">
+        <div class="list">
+            <h2>Films</h2>
+            <ul id="listeFilms"></ul>
+        </div>
+        <div class="list">
+            <h2>Jeux-vidéos</h2>
+            <ul id="listeJeux"></ul>
+        </div>
+    </div>
+
+    <div class="random-container">
+        <h2>Choisir au hasard</h2>
+        <button onclick="choisirAleatoire('films')">Film au hasard</button>
+        <button onclick="choisirAleatoire('jeux')">Jeu au hasard</button>
+        <p id="resultatRandom"></p>
+    </div>
+
+    <script>
+        function ajouterItem() {
+            let pseudo = document.getElementById("pseudo").value;
+            let input = document.getElementById("inputItem");
+            let valeur = input.value.trim();
+            let categorie = document.getElementById("categorie").value;
+            if (valeur) {
+                let liste = categorie === "films" ? document.getElementById("listeFilms") : document.getElementById("listeJeux");
+                let item = document.createElement("li");
+                item.innerHTML = `<span>${valeur} (ajouté par ${pseudo})</span> <button class="delete-btn" onclick="supprimerItem(this)">X</button>`;
+                liste.appendChild(item);
+                input.value = "";
+            }
+        }
+
+        function supprimerItem(button) {
+            let item = button.parentElement;
+            item.remove();
+        }
+
+        function choisirAleatoire(categorie) {
+            let liste = categorie === "films" ? document.getElementById("listeFilms") : document.getElementById("listeJeux");
+            let items = liste.getElementsByTagName("li");
+            if (items.length > 0) {
+                let randomIndex = Math.floor(Math.random() * items.length);
+                document.getElementById("resultatRandom").innerText = "Choix : " + items[randomIndex].innerText.replace("X", "");
+            } else {
+                document.getElementById("resultatRandom").innerText = "Aucun élément dans la liste";
+            }
+        }
+    </script>
+</body>
+
+</html>
