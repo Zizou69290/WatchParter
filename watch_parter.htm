@@ -81,20 +81,20 @@
             list-style: none;
             padding: 0;
             display: flex;
-            flex-direction: row;
+            flex-direction: column;
             align-items: center;
         }
 
         li {
             background: #696969;
-            margin: 10px;
+            margin: 10px 0;
             padding: 12px;
             border-radius: 8px;
             display: flex;
             flex-direction: column;
             align-items: center;
             transition: background 0.3s, transform 0.3s;
-            min-width: 200px;
+            width: 100%;
         }
 
         li:hover {
@@ -110,6 +110,7 @@
             cursor: pointer;
             border-radius: 5px;
             transition: background 0.3s, transform 0.3s;
+            margin-top: 10px;
         }
 
         .delete-btn:hover {
@@ -156,92 +157,39 @@
 
     <div class="random-container">
         <h2>Choisir au hasard</h2>
-        <button onclick="choisirAleatoire()">Film au hasard</button>
+        <button onclick="choisirAleatoire('films')">Film au hasard</button>
         <p id="resultatRandom"></p>
     </div>
 
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-firestore.js"></script>
-
     <script>
-        // Configuration Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyDlRIZy8uaXsNklAlj3RVBnUDEA3KJGbUU",
-            authDomain: "watchparter.firebaseapp.com",
-            projectId: "watchparter",
-            storageBucket: "watchparter.firebasestorage.app",
-            messagingSenderId: "360660931923",
-            appId: "1:360660931923:web:5bd45c35728fb6a62dbda6",
-            measurementId: "G-N7B83739MR"
-        };
-
-        // Initialiser Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore(app);
-
-        // Ajouter un film à la base de données
         function ajouterItem() {
             let pseudo = document.getElementById("pseudo").value;
             let input = document.getElementById("inputItem");
             let valeur = input.value.trim();
             if (valeur) {
-                db.collection("films").add({
-                    titre: valeur,
-                    ajoutéPar: pseudo
-                })
-                .then(() => {
-                    input.value = "";
-                })
-                .catch(error => {
-                    console.error("Erreur lors de l'ajout du film : ", error);
-                });
+                let liste = document.getElementById("listeFilms");
+                let item = document.createElement("li");
+                item.innerHTML = `<div class="poster-placeholder"></div><span>${valeur} (ajouté par ${pseudo})</span> <button class="delete-btn" onclick="supprimerItem(this)">X</button>`;
+                liste.appendChild(item);
+                input.value = "";
             }
         }
 
-        // Récupérer les films et les afficher
-        function afficherFilms() {
-            db.collection("films").get()
-            .then(snapshot => {
-                const liste = document.getElementById("listeFilms");
-                liste.innerHTML = ""; // Réinitialiser la liste
-                snapshot.forEach(doc => {
-                    const film = doc.data();
-                    const item = document.createElement("li");
-                    item.innerHTML = `<div class="poster-placeholder"></div><span>${film.titre} (ajouté par ${film.ajoutéPar})</span> <button class="delete-btn" onclick="supprimerItem('${doc.id}')">X</button>`;
-                    liste.appendChild(item);
-                });
-            })
-            .catch(error => {
-                console.error("Erreur lors de la récupération des films : ", error);
-            });
+        function supprimerItem(button) {
+            let item = button.parentElement;
+            item.remove();
         }
 
-        // Supprimer un film de la base de données
-        function supprimerItem(id) {
-            db.collection("films").doc(id).delete()
-            .then(() => {
-                afficherFilms(); // Mettre à jour la liste après suppression
-            })
-            .catch(error => {
-                console.error("Erreur lors de la suppression du film : ", error);
-            });
-        }
-
-        // Choisir un film au hasard
         function choisirAleatoire() {
-            const liste = document.getElementById("listeFilms");
-            const items = liste.getElementsByTagName("li");
+            let liste = document.getElementById("listeFilms");
+            let items = liste.getElementsByTagName("li");
             if (items.length > 0) {
-                const randomIndex = Math.floor(Math.random() * items.length);
+                let randomIndex = Math.floor(Math.random() * items.length);
                 document.getElementById("resultatRandom").innerText = "Choix : " + items[randomIndex].innerText.replace("X", "");
             } else {
                 document.getElementById("resultatRandom").innerText = "Aucun élément dans la liste";
             }
         }
-
-        // Afficher les films dès que la page est chargée
-        window.onload = afficherFilms;
     </script>
 </body>
 
