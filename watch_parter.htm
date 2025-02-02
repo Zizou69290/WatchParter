@@ -36,105 +36,11 @@
             background: #2e8b57;
             color: white;
             cursor: pointer;
-            transition: background 0.3s, transform 0.3s;
-        }
-
-        button:hover {
-            background: #006400;
-            transform: scale(1.05);
-        }
-
-        .lists-container {
-            display: flex;
-            justify-content: flex-start;
-            margin-top: 20px;
-            overflow-x: auto;
-            padding: 10px;
-            white-space: nowrap;
-        }
-
-        .list {
-            display: inline-block;
-            vertical-align: top;
-            min-width: 200px;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 15px;
-            border-radius: 12px;
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
-            transition: transform 0.3s;
-            margin-right: 10px;
-        }
-
-        .list:hover {
-            transform: scale(1.05);
-        }
-
-        .poster-placeholder {
-            width: 150px;
-            height: 200px;
-            background: #696969;
-            border-radius: 8px;
-            margin-bottom: 10px;
-        }
-
-        ul {
-            list-style: none;
-            padding: 0;
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-        }
-
-        li {
-            background: #696969;
-            margin: 10px;
-            padding: 12px;
-            border-radius: 8px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            transition: background 0.3s, transform 0.3s;
-            min-width: 200px;
-        }
-
-        li:hover {
-            background: #556b2f;
-            transform: scale(1.05);
-        }
-
-        .delete-btn {
-            background: #2e8b57;
-            color: white;
-            border: none;
-            padding: 5px 8px;
-            cursor: pointer;
-            border-radius: 5px;
-            transition: background 0.3s, transform 0.3s;
-        }
-
-        .delete-btn:hover {
-            background: #006400;
-            transform: scale(1.1);
-        }
-
-        .random-container {
-            margin-top: 30px;
-        }
-
-        .random-container button {
-            background: #556b2f;
-        }
-
-        .random-container button:hover {
-            background: #2e8b57;
-        }
-
-        #resultatRandom {
-            margin-top: 20px;
-            font-size: 1.2rem;
-            color: #a9a9a9;
         }
     </style>
+    <!-- Add Firebase scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
 </head>
 
 <body>
@@ -161,17 +67,47 @@
     </div>
 
     <script>
+        // Your Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDlRIZy8uaXsNklAlj3RVBnUDEA3KJGbUU",
+            authDomain: "watchparter.firebaseapp.com",
+            databaseURL: "https://watchparter-default-rtdb.firebaseio.com",
+            projectId: "watchparter",
+            storageBucket: "watchparter.firebasestorage.app",
+            messagingSenderId: "360660931923",
+            appId: "1:360660931923:web:5bd45c35728fb6a62dbda6",
+            measurementId: "G-N7B83739MR"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Load existing films from Firebase
+        database.ref('films').on('child_added', function(snapshot) {
+            const data = snapshot.val();
+            ajouterItemToList(data.pseudo, data.valeur);
+        });
+
         function ajouterItem() {
             let pseudo = document.getElementById("pseudo").value;
             let input = document.getElementById("inputItem");
             let valeur = input.value.trim();
             if (valeur) {
-                let liste = document.getElementById("listeFilms");
-                let item = document.createElement("li");
-                item.innerHTML = `<div class="poster-placeholder"></div><span>${valeur} (ajouté par ${pseudo})</span> <button class="delete-btn" onclick="supprimerItem(this)">X</button>`;
-                liste.appendChild(item);
+                const newFilmRef = database.ref('films').push();
+                newFilmRef.set({
+                    pseudo: pseudo,
+                    valeur: valeur
+                });
                 input.value = "";
             }
+        }
+
+        function ajouterItemToList(pseudo, valeur) {
+            let liste = document.getElementById("listeFilms");
+            let item = document.createElement("li");
+            item.innerHTML = `<div class="poster-placeholder"></div><span>${valeur} (ajouté par ${pseudo})</span> <button class="delete-btn" onclick="supprimerItem(this)">X</button>`;
+            liste.appendChild(item);
         }
 
         function supprimerItem(button) {
